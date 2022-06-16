@@ -12,6 +12,7 @@ import exec from '@actions/exec';
 import { HttpClient } from '@actions/http-client';
 import colors from 'ansi-colors';
 import yaml from 'js-yaml';
+import glob from '@actions/glob';
 
 import buildRoutes from './routes.js';
 import checkPackageName from './packageChecker.js';
@@ -26,15 +27,12 @@ const uploadArtifacts = async (diffpath) => {
     return;
   }
 
-  // https://github.com/actions/toolkit/tree/main/packages/glob
-  const filepaths = fs
-    .readdirSync(diffpath, { withFileTypes: true })
-    .filter((dirent) => dirent.isFile())
-    .map((dirent) => path.join(diffpath, dirent.name));
+  const globber = await glob.create(`${diffpath}/**`);
+  const filepaths = await globber.glob();
 
-  // if (filepaths.length === 0) {
-  //   return;
-  // }
+  if (filepaths.length === 0) {
+    return;
+  }
 
   const artifactClient = artifact.create();
   const artifactName = 'test-results';
