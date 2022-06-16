@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "src/index.js",
+  "type": "module",
   "scripts": {
     "build-run-tests": "ncc build src/bin/run-tests.js -o dist/run-tests -m --source-map",
     "build-run-post-actions": "ncc build src/bin/run-post-actions.js -o dist/run-post-actions -m --source-map",
@@ -34,12 +35,11 @@
     "lodash": "^4.17.21"
   },
   "devDependencies": {
-    "@jest/globals": "^28.1.1",
     "@vercel/ncc": "^0.34.0",
     "eslint": "^8.17.0",
-    "eslint-config-airbnb": "^19.0.4",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-jest": "^26.5.3",
     "jest": "^28.1.1",
     "nock": "^13.2.7"
   }

@@ -1,8 +1,8 @@
 // @ts-check
 
-const path = require('path');
-const core = require('@actions/core');
-const { runTests } = require('../index.js');
+import path from 'path';
+import core from '@actions/core';
+import { runTests } from '../index.js';
 
 process.on('unhandledRejection', (up) => { throw up; });
 

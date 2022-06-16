@@ -1,7 +1,10 @@
-const { describe, test, expect } = require('@jest/globals');
-const path = require('path');
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-const { checkPackageName } = require('../src/packageChecker.js');
+import checkPackageName from '../src/packageChecker.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const verifiableProjects = [
   'javascript',

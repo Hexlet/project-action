@@ -1,10 +1,10 @@
 // @ts-check
 
-const fs = require('fs');
-const path = require('path');
-const ini = require('ini');
-// const yaml = require('js-yaml');
-// const _ = require('lodash');
+import fs from 'fs';
+import path from 'path';
+import ini from 'ini';
+// import yaml from 'js-yaml';
+// import _ from 'lodash';
 
 const parsers = {
   json: JSON.parse,
@@ -55,6 +55,4 @@ const checkPackageName = (codePath, sourceLang) => {
   }
 };
 
-module.exports = {
-  checkPackageName,
-};
+export default checkPackageName;

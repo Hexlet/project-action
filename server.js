@@ -1,6 +1,8 @@
 // @ts-check
 
-const fastify = require('fastify')({ logger: true });
+import Fastify from 'fastify';
+
+const fastify = Fastify({ logger: true });
 
 // Declare a route
 fastify.get('/api/user_project_github_workflow/project_members/:id', async () => {

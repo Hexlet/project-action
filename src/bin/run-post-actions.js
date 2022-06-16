@@ -1,7 +1,7 @@
 // @ts-check
 
-const core = require('@actions/core');
-const { runPostActions } = require('../index.js');
+import core from '@actions/core';
+import { runPostActions } from '../index.js';
 
 process.on('unhandledRejection', (up) => { throw up; });
 

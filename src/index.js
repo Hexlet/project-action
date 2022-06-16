@@ -3,18 +3,18 @@
 // https://github.com/actions/javascript-action
 // https://github.com/actions/toolkit/blob/master/docs/action-debugging.md
 
-const fs = require('fs');
-const path = require('path');
-const artifact = require('@actions/artifact');
-const core = require('@actions/core');
-const io = require('@actions/io');
-const exec = require('@actions/exec');
-const { HttpClient } = require('@actions/http-client');
-const colors = require('ansi-colors');
-const yaml = require('js-yaml');
+import fs from 'fs';
+import path from 'path';
+import artifact from '@actions/artifact';
+import core from '@actions/core';
+import io from '@actions/io';
+import exec from '@actions/exec';
+import { HttpClient } from '@actions/http-client';
+import colors from 'ansi-colors';
+import yaml from 'js-yaml';
 
-const buildRoutes = require('./routes.js');
-const { checkPackageName } = require('./packageChecker.js');
+import buildRoutes from './routes.js';
+import checkPackageName from './packageChecker.js';
 
 const uploadArtifacts = async (diffpath) => {
   if (!fs.existsSync(diffpath)) {
@@ -120,7 +120,7 @@ const check = async ({ projectSourcePath, codePath, projectMember }) => {
   core.exportVariable('checkState', JSON.stringify(checkState));
 };
 
-const runTests = async (params) => {
+export const runTests = async (params) => {
   const { mountPath, projectMemberId } = params;
   const routes = buildRoutes(process.env.ACTION_API_HOST);
   const projectSourcePath = path.join(mountPath, 'source');
@@ -164,7 +164,7 @@ const finishCheck = async (projectMemberId) => {
 };
 
 // NOTE: Post actions should be performed regardless of the test completion result.
-const runPostActions = async (params) => {
+export const runPostActions = async (params) => {
   const { mountPath, projectMemberId, verbose } = params;
   const projectSourcePath = path.join(mountPath, 'source');
 
@@ -183,9 +183,4 @@ const runPostActions = async (params) => {
   await core.group('Finish check', () => finishCheck(projectMemberId));
   await core.group('Upload artifacts', () => uploadArtifacts(diffpath));
   await core.group('Upload test data', () => uploadTestData(options));
-};
-
-module.exports = {
-  runTests,
-  runPostActions,
 };
