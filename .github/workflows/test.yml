@@ -10,7 +10,7 @@ jobs:
   tests:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - run: make install
     - run: make test
     - run: make lint
@@ -18,7 +18,7 @@ jobs:
   e2e:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - run: make install
     - run: node server.js &
     - uses: ./
@@ -34,9 +34,9 @@ jobs:
     needs: e2e
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/download-artifact@v2
+    - uses: actions/download-artifact@v3
       with:
         name: test-results
-    - uses: actions/download-artifact@v2
+    - uses: actions/download-artifact@v3
       with:
         name: test-data
