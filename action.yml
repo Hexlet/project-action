@@ -8,7 +8,7 @@ inputs:
   verbose:
     description: 'show me more!'
     required: false
-    default: "false"
+    default: false
   mount-path:
     description: 'mount path'
     required: true
