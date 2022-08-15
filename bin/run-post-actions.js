@@ -7,15 +7,16 @@ import cleanStack from 'clean-stack';
 
 import { runPostActions } from '../src/index.js';
 
-const mountPath = core.getInput('mount-path', { required: true });
-const projectMemberId = core.getInput('hexlet-id', { required: true });
 const verbose = core.getBooleanInput('verbose', { required: false });
-
-const params = {
-  mountPath, projectMemberId, verbose,
-};
+const mountPath = core.getInput('mount-path', { required: true });
 
 try {
+  const projectMemberId = core.getInput('hexlet-id', { required: true });
+
+  const params = {
+    mountPath, projectMemberId, verbose,
+  };
+
   await runPostActions(params);
 } catch (e) {
   // NOTE: бектрейс экшена пользователям не нужен

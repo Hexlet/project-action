@@ -15,16 +15,17 @@ core.debug(process.cwd());
 
 const mountPath = core.getInput('mount-path', { required: true });
 const verbose = core.getBooleanInput('verbose', { required: false });
-const projectMemberId = core.getInput('hexlet-id', { required: true });
 const projectPath = path.resolve(process.cwd(), process.env.ACTION_PROJECT_PATH || '');
 
 core.exportVariable('PWD', path.join(mountPath, 'source'));
 
-const params = {
-  projectPath, mountPath, verbose, projectMemberId,
-};
-
 try {
+  const projectMemberId = core.getInput('hexlet-id', { required: true });
+
+  const params = {
+    projectPath, mountPath, verbose, projectMemberId,
+  };
+
   await runTests(params);
 } catch (e) {
   core.error('The tests have failed. Examine what they have to say. Inhale deeply. Exhale. Fix the code.');
