@@ -34,11 +34,9 @@ jobs:
     needs: e2e
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/download-artifact@v4
+    - uses: actions/download-artifact@v3
       with:
-        name: |
-          test-results.zip
-    - uses: actions/download-artifact@v4
+        name: test-results
+    - uses: actions/download-artifact@v3
       with:
-        name: |
-          test-data.zip
+        name: test-data
