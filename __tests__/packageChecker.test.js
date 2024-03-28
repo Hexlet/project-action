@@ -33,7 +33,7 @@ describe('test projects with correct package name', () => {
 
   test.each(verifiableProjects)('%s', (sourceLang) => {
     expect(() => checkPackageName(codePath, sourceLang))
-      .not.toThrowError();
+      .not.toThrow();
   });
 });
 
@@ -42,7 +42,7 @@ describe('test projects with wrong package name', () => {
 
   test.each(verifiableProjects)('%s', (sourceLang) => {
     expect(() => checkPackageName(codePath, sourceLang))
-      .toThrowError(/^Package name should be .+ instead of wrong-package-name$/);
+      .toThrow(/^Package name should be .+ instead of wrong-package-name$/);
   });
 });
 
@@ -51,6 +51,6 @@ describe('test not verifiable projects', () => {
 
   test.each(notVerifiableProjects)('%s', (sourceLang) => {
     expect(() => checkPackageName(codePath, sourceLang))
-      .not.toThrowError();
+      .not.toThrow();
   });
 });
