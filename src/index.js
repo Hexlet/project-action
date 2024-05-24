@@ -27,7 +27,7 @@ const uploadArtifacts = async (diffpath) => {
     return;
   }
 
-  const globber = await glob.create(`${diffpath}/**`);
+  const globber = await glob.create(`${diffpath}/*/**`);
   const filepaths = await globber.glob();
 
   if (filepaths.length === 0) {
