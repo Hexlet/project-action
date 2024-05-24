@@ -36,6 +36,7 @@ const uploadArtifacts = async (diffpath) => {
 
   const artifactClient = artifact.create();
   const artifactName = 'test-results';
+  console.log({artifactName, filepaths, diffpath})
   await artifactClient.uploadArtifact(artifactName, filepaths, diffpath);
   // NOTE: Users need notification that screenshots have been generated. Not error.
   core.info(colors.bgYellow.black('Download snapshots from Artifacts.'));
@@ -75,6 +76,7 @@ const uploadTestData = async (options) => {
   const artifactName = 'test-data';
   const artifactClient = artifact.create();
   const archivePath = path.join(projectSourcePath, archiveName);
+  console.log({ artifactName, archivePaths: [archivePath], projectSourcePath })
   await artifactClient.uploadArtifact(artifactName, [archivePath], projectSourcePath);
   core.info(colors.bgYellow.black('Download snapshots from Artifacts.'));
 };
