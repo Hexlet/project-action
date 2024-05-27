@@ -36,6 +36,9 @@ const uploadArtifacts = async (diffpath) => {
 
   const artifactClient = new DefaultArtifactClient();
   const artifactName = 'test-results';
+
+
+  console.log({ artifactName, filepaths, diffpath });
   await artifactClient.uploadArtifact(artifactName, filepaths, diffpath);
   // NOTE: Users need notification that screenshots have been generated. Not error.
   core.info(colors.bgYellow.black('Download snapshots from Artifacts.'));
