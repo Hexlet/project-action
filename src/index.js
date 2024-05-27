@@ -5,7 +5,7 @@
 
 import fs from 'fs';
 import path from 'path';
-import artifact from '@actions/artifact';
+import { DefaultArtifactClient } from '@actions/artifact';
 import core from '@actions/core';
 import io from '@actions/io';
 import exec from '@actions/exec';
@@ -27,14 +27,14 @@ const uploadArtifacts = async (diffpath) => {
     return;
   }
 
-  const globber = await glob.create(`${diffpath}/**`);
+  const globber = await glob.create(`${diffpath}/*/**`);
   const filepaths = await globber.glob();
 
   if (filepaths.length === 0) {
     return;
   }
 
-  const artifactClient = artifact.create();
+  const artifactClient = new DefaultArtifactClient();
   const artifactName = 'test-results';
   await artifactClient.uploadArtifact(artifactName, filepaths, diffpath);
   // NOTE: Users need notification that screenshots have been generated. Not error.
@@ -73,7 +73,7 @@ const uploadTestData = async (options) => {
   await exec.exec(command, null, cmdOptions);
 
   const artifactName = 'test-data';
-  const artifactClient = artifact.create();
+  const artifactClient = new DefaultArtifactClient();
   const archivePath = path.join(projectSourcePath, archiveName);
   await artifactClient.uploadArtifact(artifactName, [archivePath], projectSourcePath);
   core.info(colors.bgYellow.black('Download snapshots from Artifacts.'));
