@@ -109,8 +109,8 @@ const check = async ({ projectSourcePath, codePath, projectMember }) => {
   checkPackageName(codePath, sourceLang);
   const options = { cwd: projectSourcePath };
   // NOTE: Installing dependencies is part of testing the project.
-  await exec.exec('docker-compose', ['run', 'app', 'make', 'setup'], options);
-  await exec.exec('docker-compose', ['-f', 'docker-compose.yml', 'up', '--abort-on-container-exit'], options);
+  await exec.exec('docker compose', ['run', 'app', 'make', 'setup'], options);
+  await exec.exec('docker compose', ['-f', 'docker-compose.yml', 'up', '--abort-on-container-exit'], options);
 
   const checkState = {
     state: 'success',
