@@ -21,9 +21,9 @@ const mapping = {
   python: {
     expectedPackageName: 'hexlet-code',
     getPackageName: (codePath) => {
-      const data = getData(getFullPath(codePath, 'pyproject.toml'))
+      const data = getData(getFullPath(codePath, 'pyproject.toml'));
 
-      return data.tool?.poetry?.name || data.project.name
+      return data.tool?.poetry?.name || data.project.name;
     },
   },
   php: {
