@@ -20,9 +20,11 @@ const getData = (filepath) => parse(fs.readFileSync(filepath, 'utf-8'), getForma
 const mapping = {
   python: {
     expectedPackageName: 'hexlet-code',
-    getPackageName: (codePath) => (
-      getData(getFullPath(codePath, 'pyproject.toml')).tool.poetry.name
-    ),
+    getPackageName: (codePath) => {
+      const data = getData(getFullPath(codePath, 'pyproject.toml'));
+
+      return data.tool?.poetry?.name || data.project.name;
+    },
   },
   php: {
     expectedPackageName: 'hexlet/code',
