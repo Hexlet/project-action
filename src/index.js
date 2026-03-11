@@ -6,13 +6,13 @@
 import fs from 'fs';
 import path from 'path';
 import { DefaultArtifactClient } from '@actions/artifact';
-import core from '@actions/core';
-import io from '@actions/io';
-import exec from '@actions/exec';
+import * as core from '@actions/core';
+import * as io from '@actions/io';
+import * as exec from '@actions/exec';
 import { HttpClient } from '@actions/http-client';
 import colors from 'ansi-colors';
 import yaml from 'js-yaml';
-import glob from '@actions/glob';
+import * as glob from '@actions/glob';
 
 import buildRoutes from './routes.js';
 import checkPackageName from './packageChecker.js';

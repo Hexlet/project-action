@@ -2,7 +2,7 @@
 
 // @ts-check
 
-import core from '@actions/core';
+import * as core from '@actions/core';
 import cleanStack from 'clean-stack';
 
 import { runPostActions } from '../src/index.js';

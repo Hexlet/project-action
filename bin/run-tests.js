@@ -3,7 +3,7 @@
 // @ts-check
 
 import path from 'path';
-import core from '@actions/core';
+import * as core from '@actions/core';
 import cleanStack from 'clean-stack';
 
 import { runTests } from '../src/index.js';
