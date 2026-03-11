@@ -3,19 +3,18 @@
 // https://github.com/actions/javascript-action
 // https://github.com/actions/toolkit/blob/master/docs/action-debugging.md
 
-import fs from 'fs';
-import path from 'path';
+import fs from 'node:fs';
+import path from 'node:path';
 import { DefaultArtifactClient } from '@actions/artifact';
 import * as core from '@actions/core';
-import * as io from '@actions/io';
 import * as exec from '@actions/exec';
+import * as glob from '@actions/glob';
 import { HttpClient } from '@actions/http-client';
+import * as io from '@actions/io';
 import colors from 'ansi-colors';
 import yaml from 'js-yaml';
-import * as glob from '@actions/glob';
-
-import buildRoutes from './routes.js';
 import checkPackageName from './packageChecker.js';
+import buildRoutes from './routes.js';
 
 const uploadArtifacts = async (diffpath) => {
   if (!fs.existsSync(diffpath)) {
@@ -59,9 +58,9 @@ const uploadTestData = async (options) => {
     return;
   }
 
-  const existPaths = artifacts.filter((artifactPath) => (
-    fs.existsSync(path.join(projectSourcePath, artifactPath))
-  ));
+  const existPaths = artifacts.filter((artifactPath) =>
+    fs.existsSync(path.join(projectSourcePath, artifactPath)),
+  );
 
   if (existPaths.length === 0) {
     return;
@@ -75,7 +74,11 @@ const uploadTestData = async (options) => {
   const artifactName = 'test-data';
   const artifactClient = new DefaultArtifactClient();
   const archivePath = path.join(projectSourcePath, archiveName);
-  await artifactClient.uploadArtifact(artifactName, [archivePath], projectSourcePath);
+  await artifactClient.uploadArtifact(
+    artifactName,
+    [archivePath],
+    projectSourcePath,
+  );
   core.info(colors.bgYellow.black('Download snapshots from Artifacts.'));
 };
 
@@ -101,7 +104,10 @@ const prepareProject = async (options) => {
   await exec.exec(copyCmd, null, cmdOptions);
   await io.mkdirP(codePath);
   await io.cp(`${projectPath}/.`, codePath, { recursive: true });
-  await exec.exec('docker', ['build', '--cache-from', projectImageName, '.'], { ...cmdOptions, cwd: projectSourcePath });
+  await exec.exec('docker', ['build', '--cache-from', projectImageName, '.'], {
+    ...cmdOptions,
+    cwd: projectSourcePath,
+  });
 };
 
 const check = async ({ projectSourcePath, codePath, projectMember }) => {
@@ -110,7 +116,11 @@ const check = async ({ projectSourcePath, codePath, projectMember }) => {
   const options = { cwd: projectSourcePath };
   // NOTE: Installing dependencies is part of testing the project.
   await exec.exec('docker compose', ['run', 'app', 'make', 'setup'], options);
-  await exec.exec('docker compose', ['-f', 'docker-compose.yml', 'up', '--abort-on-container-exit'], options);
+  await exec.exec(
+    'docker compose',
+    ['-f', 'docker-compose.yml', 'up', '--abort-on-container-exit'],
+    options,
+  );
 
   const checkState = {
     state: 'success',
@@ -166,12 +176,7 @@ export const runPostActions = async (params) => {
   const { mountPath, projectMemberId, verbose } = params;
   const projectSourcePath = path.join(mountPath, 'source');
 
-  const diffpath = path.join(
-    mountPath,
-    'source',
-    'tmp',
-    'artifacts',
-  );
+  const diffpath = path.join(mountPath, 'source', 'tmp', 'artifacts');
 
   const options = {
     projectSourcePath,

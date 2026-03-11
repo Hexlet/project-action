@@ -1,8 +1,9 @@
 // @ts-check
 
-import fs from 'fs';
-import path from 'path';
+import fs from 'node:fs';
+import path from 'node:path';
 import ini from 'ini';
+
 // import yaml from 'js-yaml';
 // import _ from 'lodash';
 
@@ -15,7 +16,8 @@ const parsers = {
 const getFullPath = (dirpath, filename) => path.resolve(dirpath, filename);
 const getFormat = (filepath) => path.extname(filepath).slice(1);
 const parse = (content, format) => parsers[format](content);
-const getData = (filepath) => parse(fs.readFileSync(filepath, 'utf-8'), getFormat(filepath));
+const getData = (filepath) =>
+  parse(fs.readFileSync(filepath, 'utf-8'), getFormat(filepath));
 
 const mapping = {
   python: {
@@ -28,15 +30,13 @@ const mapping = {
   },
   php: {
     expectedPackageName: 'hexlet/code',
-    getPackageName: (codePath) => (
-      getData(getFullPath(codePath, 'composer.json')).name
-    ),
+    getPackageName: (codePath) =>
+      getData(getFullPath(codePath, 'composer.json')).name,
   },
   javascript: {
     expectedPackageName: '@hexlet/code',
-    getPackageName: (codePath) => (
-      getData(getFullPath(codePath, 'package.json')).name
-    ),
+    getPackageName: (codePath) =>
+      getData(getFullPath(codePath, 'package.json')).name,
   },
 };
 
@@ -53,7 +53,9 @@ const checkPackageName = (codePath, sourceLang) => {
   const packageName = getPackageName(codePath);
 
   if (packageName !== expectedPackageName) {
-    throw new Error(`Package name should be ${expectedPackageName} instead of ${packageName}`);
+    throw new Error(
+      `Package name should be ${expectedPackageName} instead of ${packageName}`,
+    );
   }
 };
 

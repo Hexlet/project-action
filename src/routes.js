@@ -1,5 +1,5 @@
 // TODO https://hexlet.io/api/user-project-github-workflow/projects/:slug/
-import path from 'path';
+import path from 'node:path';
 
 const apiUrl = '/api/user_project_github_workflow/';
 
