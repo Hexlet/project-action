@@ -41,6 +41,7 @@ const uploadArtifacts = async (diffpath) => {
 };
 
 const uploadTestData = async (options) => {
+  core.debug("start uploadTestData")
   const { projectSourcePath, verbose } = options;
 
   const specPath = path.join(projectSourcePath, '__data__', 'spec.yml');
@@ -181,8 +182,11 @@ const finishCheck = async (projectMemberId) => {
 
 // NOTE: Post actions should be performed regardless of the test completion result.
 export const runPostActions = async (params) => {
+  core.debug('start runPostActions')
   const { mountPath, projectMemberId, verbose } = params;
   const projectSourcePath = path.join(mountPath, 'source');
+  core.debug(JSON.stringify({ projectSourcePath }))
+
 
   const diffpath = path.join(mountPath, 'source', 'tmp', 'artifacts');
 
@@ -194,4 +198,5 @@ export const runPostActions = async (params) => {
   await core.group('Finish check', () => finishCheck(projectMemberId));
   await core.group('Upload artifacts', () => uploadArtifacts(diffpath));
   await core.group('Upload test data', () => uploadTestData(options));
+  core.debug('finish runPostActions')
 };
