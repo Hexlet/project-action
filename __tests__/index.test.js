@@ -1,9 +1,9 @@
-import fs from 'fs';
-import path from 'path';
-import os from 'os';
+import { execSync } from 'node:child_process';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import { fileURLToPath, URL } from 'node:url';
 import nock from 'nock';
-import { URL, fileURLToPath } from 'url';
-import { execSync } from 'child_process';
 import { runTests } from '../src/index.js';
 import buildRoutes from '../src/routes.js';
 
@@ -26,18 +26,20 @@ it('runTests', async () => {
       language: 'ruby',
     },
   };
-  nock(url.origin)
-    .get(url.pathname)
-    .query(true)
-    .reply(200, result);
+  nock(url.origin).get(url.pathname).query(true).reply(200, result);
 
   const tmp = os.tmpdir();
-  const mountPath = await fsp.mkdtemp(path.join(tmp, 'hexlet-project-'));
-  const projectPath = await fsp.mkdtemp(path.join(tmp, 'hexlet-project-'));
+  const mountPath = await fsp.mkdtemp(path.join(tmp, 'hexlet-project-mount-'));
+  const projectPath = await fsp.mkdtemp(
+    path.join(tmp, 'hexlet-project-fixture-'),
+  );
   execSync(`cp -r ${projectFixture}/. ${projectPath}`);
 
   await runTests({
-    mountPath, projectPath, verbose: true, projectMemberId,
+    mountPath,
+    projectPath,
+    verbose: true,
+    projectMemberId,
   });
 
   expect(true).toBe(true);

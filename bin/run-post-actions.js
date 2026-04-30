@@ -2,7 +2,7 @@
 
 // @ts-check
 
-import core from '@actions/core';
+import * as core from '@actions/core';
 import cleanStack from 'clean-stack';
 
 import { runPostActions } from '../src/index.js';
@@ -12,7 +12,9 @@ const mountPath = core.getInput('mount-path', { required: true });
 const projectMemberId = core.getInput('hexlet-id', { required: true });
 
 const params = {
-  mountPath, projectMemberId, verbose,
+  mountPath,
+  projectMemberId,
+  verbose,
 };
 
 try {

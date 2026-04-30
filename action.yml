@@ -15,6 +15,6 @@ inputs:
     default: "/var/tmp"
 
 runs:
-  using: 'node20'
+  using: 'node24'
   main: 'dist/run-tests/index.js'
   post: 'dist/run-post-actions/index.js'

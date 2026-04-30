@@ -2,8 +2,8 @@
 
 // @ts-check
 
-import path from 'path';
-import core from '@actions/core';
+import path from 'node:path';
+import * as core from '@actions/core';
 import cleanStack from 'clean-stack';
 
 import { runTests } from '../src/index.js';
@@ -15,19 +15,27 @@ core.debug(process.cwd());
 
 const mountPath = core.getInput('mount-path', { required: true });
 const verbose = core.getBooleanInput('verbose', { required: false });
-const projectPath = path.resolve(process.cwd(), process.env.ACTION_PROJECT_PATH || '');
+const projectPath = path.resolve(
+  process.cwd(),
+  process.env.ACTION_PROJECT_PATH || '',
+);
 const projectMemberId = core.getInput('hexlet-id', { required: true });
 
 core.exportVariable('PWD', path.join(mountPath, 'source'));
 
 const params = {
-  projectPath, mountPath, verbose, projectMemberId,
+  projectPath,
+  mountPath,
+  verbose,
+  projectMemberId,
 };
 
 try {
   await runTests(params);
 } catch (e) {
-  core.error('The tests have failed. Examine what they have to say. Inhale deeply. Exhale. Fix the code.');
+  core.error(
+    'The tests have failed. Examine what they have to say. Inhale deeply. Exhale. Fix the code.',
+  );
   // NOTE: бектрейс экшена пользователям не нужен
   if (!verbose) {
     e.stack = cleanStack(e.stack);

@@ -1,7 +1,8 @@
-setup:
-	docker pull hexletprojects/hexlet-project-source-ci
+setup: pull setup
+
+pull:
+	docker pull hexletprojects/hexlet-project-source-ci:latest
 	docker pull ubuntu:latest
-	make install
 
 install:
 	npm install
@@ -13,8 +14,10 @@ test:
 	ACTIONS_RUNNER_DEBUG=1 npx jest
 
 lint:
-	npx eslint .
+	npx @biomejs/biome check
 
-# TODO: release authomatically after build
-release:
-	git push -f origin master:release
+lint-fix:
+	npx @biomejs/biome check --fix
+
+update-deps:
+	npx ncu -u
