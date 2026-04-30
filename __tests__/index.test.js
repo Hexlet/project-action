@@ -29,8 +29,8 @@ it('runTests', async () => {
   nock(url.origin).get(url.pathname).query(true).reply(200, result);
 
   const tmp = os.tmpdir();
-  const mountPath = await fsp.mkdtemp(path.join(tmp, 'hexlet-project-'));
-  const projectPath = await fsp.mkdtemp(path.join(tmp, 'hexlet-project-'));
+  const mountPath = await fsp.mkdtemp(path.join(tmp, 'hexlet-project-mount-'));
+  const projectPath = await fsp.mkdtemp(path.join(tmp, 'hexlet-project-fixture-'));
   execSync(`cp -r ${projectFixture}/. ${projectPath}`);
 
   await runTests({
