@@ -75,17 +75,22 @@ const uploadTestData = async (options) => {
     return;
   }
 
-  const archiveName = 'test-data.zip';
-  const cmdOptions = { silent: !verbose, cwd: projectSourcePath };
-  const command = `zip -r ${archiveName} ${existPaths.join(' ')}`;
-  await exec.exec(command, null, cmdOptions);
+
+  const filesToUpload = existPaths.flatMap((relPath) => {
+    const absPath = path.join(projectSourcePath, relPath);
+    if (fs.statSync(absPath).isDirectory()) {
+      return fs.readdirSync(absPath, { recursive: true })
+        .map((f) => path.join(absPath, f))
+        .filter((f) => fs.statSync(f).isFile());
+    }
+    return [absPath];
+  })
 
   const artifactName = 'test-data';
   const artifactClient = new DefaultArtifactClient();
-  const archivePath = path.join(projectSourcePath, archiveName);
   await artifactClient.uploadArtifact(
     artifactName,
-    [archivePath],
+    filesToUpload,
     projectSourcePath,
   );
   core.info(colors.bgYellow.black('Download snapshots from Artifacts.'));
