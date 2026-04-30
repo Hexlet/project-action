@@ -47,6 +47,7 @@ const uploadTestData = async (options) => {
 
   // NOTE: The project image is not downloaded until the last step is reached.
   if (!fs.existsSync(specPath)) {
+    core.debug(`uploadTestData: spec.yml not found at ${specPath}, skipping`);
     return;
   }
 
@@ -55,6 +56,9 @@ const uploadTestData = async (options) => {
   const { artifacts } = specData.project;
 
   if (!artifacts) {
+    core.debug(
+      'uploadTestData: no artifacts key in spec.yml project section, skipping',
+    );
     return;
   }
 
@@ -63,6 +67,10 @@ const uploadTestData = async (options) => {
   );
 
   if (existPaths.length === 0) {
+    const missingPaths = artifacts.map((p) => path.join(projectSourcePath, p));
+    core.warning(
+      `uploadTestData: artifact paths specified in spec.yml but none exist on disk:\n${missingPaths.join('\n')}`,
+    );
     return;
   }
 
@@ -95,7 +103,7 @@ const prepareProject = async (options) => {
 
   const projectImageName = `hexletprojects/${projectMember.project.image_name}:latest`;
   await io.mkdirP(projectSourcePath);
-  const pullCmd = `docker pull ${projectImageName}"`;
+  const pullCmd = `docker pull ${projectImageName}`;
   await exec.exec(pullCmd, null, cmdOptions);
   // NOTE: the code directory remove from the container,
   // since it was created under the rights of root.
