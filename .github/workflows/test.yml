@@ -20,6 +20,7 @@ jobs:
     steps:
     - uses: actions/checkout@v6
     - run: make install
+    - run: make build
     - run: node server.js &
     - uses: ./
       env:

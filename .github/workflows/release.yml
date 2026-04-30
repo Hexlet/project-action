@@ -1,0 +1,25 @@
+name: release
+on:
+  workflow_run:
+    workflows: ["test"]
+    branches: [master]
+    types: [completed]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - run: make install
+      - run: make build
+      - name: Push to release branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add dist/
+          git commit -m "build: update dist [skip ci]"
+          git push -f origin HEAD:release
