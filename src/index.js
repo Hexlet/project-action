@@ -18,6 +18,7 @@ import buildRoutes from './routes.js';
 
 const uploadArtifacts = async (diffpath) => {
   if (!fs.existsSync(diffpath)) {
+    core.info(`uploadArtifacts: no artifacts directory at ${diffpath}, skipping`);
     return;
   }
 
@@ -30,6 +31,7 @@ const uploadArtifacts = async (diffpath) => {
   const filepaths = await globber.glob();
 
   if (filepaths.length === 0) {
+    core.info('uploadArtifacts: artifacts directory is empty, skipping');
     return;
   }
 
@@ -48,7 +50,7 @@ const uploadTestData = async (options) => {
 
   // NOTE: The project image is not downloaded until the last step is reached.
   if (!fs.existsSync(specPath)) {
-    core.debug(`uploadTestData: spec.yml not found at ${specPath}, skipping`);
+    core.info(`uploadTestData: spec.yml not found at ${specPath}, skipping`);
     return;
   }
 
@@ -57,9 +59,7 @@ const uploadTestData = async (options) => {
   const { artifacts } = specData.project;
 
   if (!artifacts) {
-    core.debug(
-      'uploadTestData: no artifacts key in spec.yml project section, skipping',
-    );
+    core.info('uploadTestData: no artifacts key in spec.yml project section, skipping');
     return;
   }
 
