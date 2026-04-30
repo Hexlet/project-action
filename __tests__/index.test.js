@@ -30,7 +30,9 @@ it('runTests', async () => {
 
   const tmp = os.tmpdir();
   const mountPath = await fsp.mkdtemp(path.join(tmp, 'hexlet-project-mount-'));
-  const projectPath = await fsp.mkdtemp(path.join(tmp, 'hexlet-project-fixture-'));
+  const projectPath = await fsp.mkdtemp(
+    path.join(tmp, 'hexlet-project-fixture-'),
+  );
   execSync(`cp -r ${projectFixture}/. ${projectPath}`);
 
   await runTests({

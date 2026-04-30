@@ -18,7 +18,9 @@ import buildRoutes from './routes.js';
 
 const uploadArtifacts = async (diffpath) => {
   if (!fs.existsSync(diffpath)) {
-    core.info(`uploadArtifacts: no artifacts directory at ${diffpath}, skipping`);
+    core.info(
+      `uploadArtifacts: no artifacts directory at ${diffpath}, skipping`,
+    );
     return;
   }
 
@@ -43,7 +45,7 @@ const uploadArtifacts = async (diffpath) => {
 };
 
 const uploadTestData = async (options) => {
-  core.debug("start uploadTestData")
+  core.debug('start uploadTestData');
   const { projectSourcePath, verbose } = options;
 
   const specPath = path.join(projectSourcePath, '__data__', 'spec.yml');
@@ -59,7 +61,9 @@ const uploadTestData = async (options) => {
   const { artifacts } = specData.project;
 
   if (!artifacts) {
-    core.info('uploadTestData: no artifacts key in spec.yml project section, skipping');
+    core.info(
+      'uploadTestData: no artifacts key in spec.yml project section, skipping',
+    );
     return;
   }
 
@@ -75,16 +79,16 @@ const uploadTestData = async (options) => {
     return;
   }
 
-
   const filesToUpload = existPaths.flatMap((relPath) => {
     const absPath = path.join(projectSourcePath, relPath);
     if (fs.statSync(absPath).isDirectory()) {
-      return fs.readdirSync(absPath, { recursive: true })
+      return fs
+        .readdirSync(absPath, { recursive: true })
         .map((f) => path.join(absPath, f))
         .filter((f) => fs.statSync(f).isFile());
     }
     return [absPath];
-  })
+  });
 
   const artifactName = 'test-data';
   const artifactClient = new DefaultArtifactClient();
@@ -187,11 +191,10 @@ const finishCheck = async (projectMemberId) => {
 
 // NOTE: Post actions should be performed regardless of the test completion result.
 export const runPostActions = async (params) => {
-  core.debug('start runPostActions')
+  core.debug('start runPostActions');
   const { mountPath, projectMemberId, verbose } = params;
   const projectSourcePath = path.join(mountPath, 'source');
-  core.debug(JSON.stringify({ projectSourcePath }))
-
+  core.debug(JSON.stringify({ projectSourcePath }));
 
   const diffpath = path.join(mountPath, 'source', 'tmp', 'artifacts');
 
@@ -203,5 +206,5 @@ export const runPostActions = async (params) => {
   await core.group('Finish check', () => finishCheck(projectMemberId));
   await core.group('Upload artifacts', () => uploadArtifacts(diffpath));
   await core.group('Upload test data', () => uploadTestData(options));
-  core.debug('finish runPostActions')
+  core.debug('finish runPostActions');
 };
