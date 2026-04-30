@@ -1,7 +1,8 @@
-setup:
+setup: pull setup
+
+pull:
 	docker pull hexletprojects/hexlet-project-source-ci:latest
 	docker pull ubuntu:latest
-	make install
 
 install:
 	npm install
