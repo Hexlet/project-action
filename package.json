@@ -5,10 +5,11 @@
   "main": "src/index.js",
   "type": "module",
   "scripts": {
-    "build-run-tests": "ncc build bin/run-tests.js -o dist/run-tests -m --source-map",
-    "build-run-post-actions": "ncc build bin/run-post-actions.js -o dist/run-post-actions -m --source-map",
+    "build-run-tests": "ncc build bin/run-tests.ts -o dist/run-tests -m --source-map",
+    "build-run-post-actions": "ncc build bin/run-post-actions.ts -o dist/run-post-actions -m --source-map",
     "build": "npm run build-run-tests && npm run build-run-post-actions",
-    "test": "jest"
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
   },
   "repository": {
     "type": "git",
@@ -36,11 +37,16 @@
     "lodash": "^4.18.1"
   },
   "devDependencies": {
-    "fastify": "^5.8.5",
     "@biomejs/biome": "2.4.13",
+    "@types/ini": "^4.1.1",
+    "@types/js-yaml": "^4.0.9",
+    "@types/lodash": "^4.17.24",
+    "@types/node": "^24.12.2",
     "@vercel/ncc": "^0.38.4",
-    "jest": "^30.3.0",
+    "fastify": "^5.8.5",
     "nock": "^14.0.13",
-    "npm-check-updates": "^22.0.1"
+    "npm-check-updates": "^22.0.1",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.5"
   }
 }

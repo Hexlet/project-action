@@ -1,25 +1,29 @@
-// @ts-check
-
 import fs from 'node:fs';
 import path from 'node:path';
 import ini from 'ini';
 
-// import yaml from 'js-yaml';
-// import _ from 'lodash';
+type SupportedFormat = 'json' | 'toml';
 
-const parsers = {
+interface LanguageHandler {
+  expectedPackageName: string;
+  getPackageName: (codePath: string) => string;
+}
+
+const parsers: Record<SupportedFormat, (content: string) => any> = {
   json: JSON.parse,
   toml: ini.parse,
-  // yml: yaml.load,
 };
 
-const getFullPath = (dirpath, filename) => path.resolve(dirpath, filename);
-const getFormat = (filepath) => path.extname(filepath).slice(1);
-const parse = (content, format) => parsers[format](content);
-const getData = (filepath) =>
+const getFullPath = (dirpath: string, filename: string) =>
+  path.resolve(dirpath, filename);
+const getFormat = (filepath: string) =>
+  path.extname(filepath).slice(1) as SupportedFormat;
+const parse = (content: string, format: SupportedFormat) =>
+  parsers[format](content);
+const getData = (filepath: string) =>
   parse(fs.readFileSync(filepath, 'utf-8'), getFormat(filepath));
 
-const mapping = {
+const mapping: Record<string, LanguageHandler> = {
   python: {
     expectedPackageName: 'hexlet-code',
     getPackageName: (codePath) => {
@@ -40,7 +44,14 @@ const mapping = {
   },
 };
 
-const checkPackageName = (codePath, sourceLang) => {
+const checkPackageName = (
+  codePath: string,
+  sourceLang: string | null | undefined,
+) => {
+  if (!sourceLang) {
+    return;
+  }
+
   const props = mapping[sourceLang];
 
   // NOTE: If the properties for checking the current project

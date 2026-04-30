@@ -4,6 +4,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath, URL } from 'node:url';
 import nock from 'nock';
+import { expect, it } from 'vitest';
 import { runTests } from '../src/index.js';
 import buildRoutes from '../src/routes.js';
 

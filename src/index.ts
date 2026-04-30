@@ -1,5 +1,3 @@
-// @ts-check
-
 // https://github.com/actions/javascript-action
 // https://github.com/actions/toolkit/blob/master/docs/action-debugging.md
 
@@ -16,7 +14,36 @@ import yaml from 'js-yaml';
 import checkPackageName from './packageChecker.js';
 import buildRoutes from './routes.js';
 
-const uploadArtifacts = async (diffpath) => {
+interface ProjectMember {
+  tests_on: boolean;
+  project: { image_name: string; language: string };
+}
+
+interface RunTestsParams {
+  mountPath: string;
+  projectPath: string;
+  projectMemberId: number | string;
+  verbose: boolean;
+}
+
+interface RunPostActionsParams {
+  mountPath: string;
+  projectMemberId: number | string;
+  verbose: boolean;
+}
+
+interface PrepareProjectOptions extends RunTestsParams {
+  codePath: string;
+  projectSourcePath: string;
+  projectMember: ProjectMember;
+}
+
+interface UploadTestDataOptions {
+  projectSourcePath: string;
+  verbose: boolean;
+}
+
+const uploadArtifacts = async (diffpath: string) => {
   if (!fs.existsSync(diffpath)) {
     core.info(
       `uploadArtifacts: no artifacts directory at ${diffpath}, skipping`,
@@ -44,7 +71,7 @@ const uploadArtifacts = async (diffpath) => {
   core.info(colors.bgYellow.black('Download snapshots from Artifacts.'));
 };
 
-const uploadTestData = async (options) => {
+const uploadTestData = async (options: UploadTestDataOptions) => {
   core.debug('start uploadTestData');
   const { projectSourcePath, verbose } = options;
 
@@ -57,7 +84,9 @@ const uploadTestData = async (options) => {
   }
 
   const specContent = fs.readFileSync(specPath).toString();
-  const specData = yaml.load(specContent);
+  const specData = yaml.load(specContent) as {
+    project: { artifacts: string[] };
+  };
   const { artifacts } = specData.project;
 
   if (!artifacts) {
@@ -83,7 +112,7 @@ const uploadTestData = async (options) => {
     const absPath = path.join(projectSourcePath, relPath);
     if (fs.statSync(absPath).isDirectory()) {
       return fs
-        .readdirSync(absPath, { recursive: true })
+        .readdirSync(absPath, { encoding: 'utf-8', recursive: true })
         .map((f) => path.join(absPath, f))
         .filter((f) => fs.statSync(f).isFile());
     }
@@ -100,7 +129,7 @@ const uploadTestData = async (options) => {
   core.info(colors.bgYellow.black('Download snapshots from Artifacts.'));
 };
 
-const prepareProject = async (options) => {
+const prepareProject = async (options: PrepareProjectOptions) => {
   const {
     codePath,
     projectPath,
@@ -114,12 +143,12 @@ const prepareProject = async (options) => {
   const projectImageName = `hexletprojects/${projectMember.project.image_name}:latest`;
   await io.mkdirP(projectSourcePath);
   const pullCmd = `docker pull ${projectImageName}`;
-  await exec.exec(pullCmd, null, cmdOptions);
+  await exec.exec(pullCmd, undefined, cmdOptions);
   // NOTE: the code directory remove from the container,
   // since it was created under the rights of root.
   // await io.rmRF(codePath); - deletes a directory with the rights of the current user
   const copyCmd = `docker run -v ${mountPath}:/mnt ${projectImageName} bash -c "cp -r /project/. /mnt/source && rm -rf /mnt/source/code"`;
-  await exec.exec(copyCmd, null, cmdOptions);
+  await exec.exec(copyCmd, undefined, cmdOptions);
   await io.mkdirP(codePath);
   await io.cp(`${projectPath}/.`, codePath, { recursive: true });
   await exec.exec('docker', ['build', '--cache-from', projectImageName, '.'], {
@@ -128,7 +157,11 @@ const prepareProject = async (options) => {
   });
 };
 
-const check = async ({ projectSourcePath, codePath, projectMember }) => {
+const check = async ({
+  projectSourcePath,
+  codePath,
+  projectMember,
+}: PrepareProjectOptions) => {
   const sourceLang = projectMember.project.language;
   checkPackageName(codePath, sourceLang);
   const options = { cwd: projectSourcePath };
@@ -146,7 +179,7 @@ const check = async ({ projectSourcePath, codePath, projectMember }) => {
   core.exportVariable('checkState', JSON.stringify(checkState));
 };
 
-export const runTests = async (params) => {
+export const runTests = async (params: RunTestsParams) => {
   const { mountPath, projectMemberId } = params;
   const routes = buildRoutes(process.env.ACTION_API_HOST);
   const projectSourcePath = path.join(mountPath, 'source');
@@ -161,14 +194,14 @@ export const runTests = async (params) => {
   const response = await http.get(link);
   const data = await response.readBody();
   core.debug(data);
-  const projectMember = JSON.parse(data);
+  const projectMember = JSON.parse(data) as ProjectMember;
 
   if (!projectMember.tests_on) {
     core.warning('Tests will run during review step');
     return;
   }
 
-  const options = {
+  const options: PrepareProjectOptions = {
     ...params,
     codePath,
     projectMember,
@@ -179,7 +212,7 @@ export const runTests = async (params) => {
   await check(options);
 };
 
-const finishCheck = async (projectMemberId) => {
+const finishCheck = async (projectMemberId: number | string) => {
   const { checkState } = process.env;
 
   const routes = buildRoutes(process.env.ACTION_API_HOST);
@@ -190,7 +223,7 @@ const finishCheck = async (projectMemberId) => {
 };
 
 // NOTE: Post actions should be performed regardless of the test completion result.
-export const runPostActions = async (params) => {
+export const runPostActions = async (params: RunPostActionsParams) => {
   core.debug('start runPostActions');
   const { mountPath, projectMemberId, verbose } = params;
   const projectSourcePath = path.join(mountPath, 'source');
@@ -198,7 +231,7 @@ export const runPostActions = async (params) => {
 
   const diffpath = path.join(mountPath, 'source', 'tmp', 'artifacts');
 
-  const options = {
+  const options: UploadTestDataOptions = {
     projectSourcePath,
     verbose,
   };

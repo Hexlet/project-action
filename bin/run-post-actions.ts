@@ -1,7 +1,5 @@
 #!/usr/bin/env node
 
-// @ts-check
-
 import * as core from '@actions/core';
 import cleanStack from 'clean-stack';
 
@@ -21,8 +19,8 @@ try {
   await runPostActions(params);
 } catch (e) {
   // NOTE: бектрейс экшена пользователям не нужен
-  if (!verbose) {
-    e.stack = cleanStack(e.stack);
+  if (!verbose && e instanceof Error) {
+    e.stack = cleanStack(e.stack ?? '');
   }
   throw e;
 }

@@ -1,5 +1,6 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { describe, expect, test } from 'vitest';
 
 import checkPackageName from '../src/packageChecker.js';
 
@@ -11,7 +12,7 @@ const verifiableProjects = ['javascript', 'php', 'python'];
 // NOTE: Some projects are not packages.
 // Also, in some languages, verification is not needed,
 // since the package name is verified when installing the dependencies.
-const notVerifiableProjects = [
+const notVerifiableProjects: Array<string | null | undefined> = [
   'html',
   'ruby',
   'java',
@@ -20,7 +21,7 @@ const notVerifiableProjects = [
   undefined,
 ];
 
-const getFixturePath = (dirname) =>
+const getFixturePath = (dirname: string) =>
   path.join(__dirname, '..', '__fixtures__', 'package_files', dirname);
 
 describe('test projects with correct package name', () => {

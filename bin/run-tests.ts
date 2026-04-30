@@ -1,7 +1,5 @@
 #!/usr/bin/env node
 
-// @ts-check
-
 import path from 'node:path';
 import * as core from '@actions/core';
 import cleanStack from 'clean-stack';
@@ -37,8 +35,8 @@ try {
     'The tests have failed. Examine what they have to say. Inhale deeply. Exhale. Fix the code.',
   );
   // NOTE: бектрейс экшена пользователям не нужен
-  if (!verbose) {
-    e.stack = cleanStack(e.stack);
+  if (!verbose && e instanceof Error) {
+    e.stack = cleanStack(e.stack ?? '');
   }
   throw e;
 }

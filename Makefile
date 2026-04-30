@@ -11,7 +11,10 @@ build:
 	npm run build
 
 test:
-	ACTIONS_RUNNER_DEBUG=1 npx jest
+	ACTIONS_RUNNER_DEBUG=1 npx vitest run
+
+typecheck:
+	npx tsc --noEmit
 
 lint:
 	npx @biomejs/biome check

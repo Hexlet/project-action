@@ -1,5 +1,4 @@
-// @ts-check
-
+import type { AddressInfo } from 'node:net';
 import Fastify from 'fastify';
 
 const fastify = Fastify({ logger: true });
@@ -23,7 +22,8 @@ fastify.get(
 const start = async () => {
   try {
     await fastify.listen({ port: 3000 });
-    fastify.log.info(`server listening on ${fastify.server.address().port}`);
+    const addr = fastify.server.address() as AddressInfo;
+    fastify.log.info(`server listening on ${addr.port}`);
   } catch (err) {
     fastify.log.error(err);
     process.exit(1);
