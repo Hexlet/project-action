@@ -1,6 +1,6 @@
-import fs from 'node:fs';
-import path from 'node:path';
-import ini from 'ini';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
+import * as ini from 'ini';
 
 type SupportedFormat = 'json' | 'toml';
 

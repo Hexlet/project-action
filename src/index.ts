@@ -1,16 +1,16 @@
 // https://github.com/actions/javascript-action
 // https://github.com/actions/toolkit/blob/master/docs/action-debugging.md
 
-import fs from 'node:fs';
-import path from 'node:path';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 import { DefaultArtifactClient } from '@actions/artifact';
 import * as core from '@actions/core';
 import * as exec from '@actions/exec';
 import * as glob from '@actions/glob';
 import { HttpClient } from '@actions/http-client';
 import * as io from '@actions/io';
-import colors from 'ansi-colors';
-import yaml from 'js-yaml';
+import * as colors from 'ansi-colors';
+import * as yaml from 'js-yaml';
 import checkPackageName from './packageChecker.js';
 import buildRoutes from './routes.js';
 
