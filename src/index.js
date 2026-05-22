@@ -128,7 +128,7 @@ const prepareProject = async (options) => {
   });
 };
 
-const getTestService = (projectSourcePath) => {
+export const getTestService = (projectSourcePath) => {
   const composePath = path.join(projectSourcePath, 'docker-compose.yml');
   const composeData = yaml.load(fs.readFileSync(composePath).toString());
   return composeData?.services?.test ? 'test' : 'app';
