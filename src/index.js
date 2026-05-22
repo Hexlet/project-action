@@ -128,15 +128,22 @@ const prepareProject = async (options) => {
   });
 };
 
+export const getTestService = (projectSourcePath) => {
+  const composePath = path.join(projectSourcePath, 'docker-compose.yml');
+  const composeData = yaml.load(fs.readFileSync(composePath).toString());
+  return composeData?.services?.test ? 'test' : 'app';
+};
+
 const check = async ({ projectSourcePath, codePath, projectMember }) => {
   const sourceLang = projectMember.project.language;
   checkPackageName(codePath, sourceLang);
   const options = { cwd: projectSourcePath };
   // NOTE: Installing dependencies is part of testing the project.
   await exec.exec('docker compose', ['run', 'app', 'make', 'setup'], options);
+  const testService = getTestService(projectSourcePath);
   await exec.exec(
     'docker compose',
-    ['-f', 'docker-compose.yml', 'up', '--abort-on-container-exit'],
+    ['-f', 'docker-compose.yml', 'up', '--abort-on-container-exit', '--exit-code-from', testService],
     options,
   );
 
