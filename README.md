@@ -32,6 +32,8 @@ services:
 
 After tests finish, the action automatically uploads everything under `/project/tmp/artifacts/` as a `test-results` GitHub Actions artifact. Students download it and open `playwright-report/index.html` locally.
 
+Only **files** are collected — directories are not added to the archive as entries of their own, and empty ones are skipped. Keep artifact paths ASCII: non-ASCII names survive into the zip and are rendered inconsistently across archivers and operating systems.
+
 Example `playwright.config.js`:
 
 ```js

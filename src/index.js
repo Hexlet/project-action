@@ -29,7 +29,14 @@ const uploadArtifacts = async (diffpath) => {
     return;
   }
 
-  const globber = await glob.create(`${diffpath}/*/**`);
+  // NOTE: matchDirectories: false is essential. `**` matches zero segments, so with the
+  // default (true) the directories themselves end up in the list. @actions/artifact then
+  // writes each one as a zero-byte entry WITHOUT a trailing slash, so the zip ends up with
+  // both a file `X` and a directory `X/…`. unzip then fails with "X exists but is not
+  // directory" and silently drops every file inside it.
+  const globber = await glob.create(`${diffpath}/*/**`, {
+    matchDirectories: false,
+  });
   const filepaths = await globber.glob();
 
   if (filepaths.length === 0) {
