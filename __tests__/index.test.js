@@ -22,7 +22,7 @@ it('runTests', async () => {
   const result = {
     tests_on: true,
     project: {
-      image_name: 'hexlet-project-source-ci',
+      image_name: 'hexlet-project-source-ci_en',
       language: 'ruby',
     },
   };

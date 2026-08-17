@@ -139,13 +139,34 @@ const check = async ({ projectSourcePath, codePath, projectMember }) => {
   const sourceLang = projectMember.project.language;
   checkPackageName(codePath, sourceLang);
   const options = { cwd: projectSourcePath };
+  // NOTE: -f docker-compose.yml is required: the project image also carries
+  // docker-compose.override.yml, which switches app to its dev command.
+  const composeFile = ['-f', 'docker-compose.yml'];
   // NOTE: Installing dependencies is part of testing the project.
-  await exec.exec('docker compose', ['run', 'app', 'make', 'setup'], options);
   await exec.exec(
     'docker compose',
-    ['-f', 'docker-compose.yml', 'up', '--abort-on-container-exit'],
+    [...composeFile, 'run', '--rm', 'app', 'make', 'setup'],
     options,
   );
+  // NOTE: The verdict is the exit code of the test service. up would report the
+  // exit code of whichever container stopped first, so app and db shut down
+  // after successful tests turned a green run red.
+  try {
+    await exec.exec(
+      'docker compose',
+      [...composeFile, 'run', '--rm', 'test'],
+      options,
+    );
+  } catch (err) {
+    // NOTE: run attaches to the test container only, so logs of the services it
+    // waited for are the only clue left for a failing server project.
+    await exec.exec(
+      'docker compose',
+      [...composeFile, 'logs', '--no-color', '--tail', '200'],
+      { ...options, ignoreReturnCode: true },
+    );
+    throw err;
+  }
 
   const checkState = {
     state: 'success',
