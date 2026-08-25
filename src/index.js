@@ -139,13 +139,48 @@ const check = async ({ projectSourcePath, codePath, projectMember }) => {
   const sourceLang = projectMember.project.language;
   checkPackageName(codePath, sourceLang);
   const options = { cwd: projectSourcePath };
+  // NOTE: -f docker-compose.yml is required: the project image also carries
+  // docker-compose.override.yml, which switches app to its dev command.
+  const composeFile = ['-f', 'docker-compose.yml'];
   // NOTE: Installing dependencies is part of testing the project.
-  await exec.exec('docker compose', ['run', 'app', 'make', 'setup'], options);
   await exec.exec(
     'docker compose',
-    ['-f', 'docker-compose.yml', 'up', '--abort-on-container-exit'],
+    [...composeFile, 'run', '--rm', 'app', 'make', 'setup'],
     options,
   );
+  // NOTE: The verdict is the exit code of the test service. up would report the
+  // exit code of whichever container stopped first, so app and db shut down
+  // after successful tests turned a green run red.
+  //
+  // The service is not in every project image yet, so the step falls back to up.
+  // Without the fallback the merge would be a flag day: run --rm test on a
+  // project without the service exits 1, and "no such service" is
+  // indistinguishable from failing tests. The up branch goes away once every
+  // published image carries test. Mirrors hexlet-project-source-ci's template.
+  const { stdout: serviceList } = await exec.getExecOutput(
+    'docker compose',
+    [...composeFile, 'config', '--services'],
+    options,
+  );
+  const hasTestService = serviceList
+    .split('\n')
+    .map((name) => name.trim())
+    .includes('test');
+  const verdictArgs = hasTestService
+    ? [...composeFile, 'run', '--rm', 'test']
+    : [...composeFile, 'up', '--abort-on-container-exit'];
+  try {
+    await exec.exec('docker compose', verdictArgs, options);
+  } catch (err) {
+    // NOTE: run attaches to the test container only, so logs of the services it
+    // waited for are the only clue left for a failing server project.
+    await exec.exec(
+      'docker compose',
+      [...composeFile, 'logs', '--no-color', '--tail', '200'],
+      { ...options, ignoreReturnCode: true },
+    );
+    throw err;
+  }
 
   const checkState = {
     state: 'success',

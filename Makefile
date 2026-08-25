@@ -1,7 +1,7 @@
 setup: pull setup
 
 pull:
-	docker pull hexletprojects/hexlet-project-source-ci:latest
+	docker pull hexletprojects/hexlet-project-source-ci_en:latest
 	docker pull ubuntu:latest
 
 install:
