@@ -13,7 +13,6 @@ import { HttpClient } from '@actions/http-client';
 import * as io from '@actions/io';
 import colors from 'ansi-colors';
 import yaml from 'js-yaml';
-import checkPackageName from './packageChecker.js';
 import buildRoutes from './routes.js';
 
 const uploadArtifacts = async (diffpath) => {
@@ -135,9 +134,7 @@ const prepareProject = async (options) => {
   });
 };
 
-const check = async ({ projectSourcePath, codePath, projectMember }) => {
-  const sourceLang = projectMember.project.language;
-  checkPackageName(codePath, sourceLang);
+const check = async ({ projectSourcePath }) => {
   const options = { cwd: projectSourcePath };
   // NOTE: -f docker-compose.yml is required: the project image also carries
   // docker-compose.override.yml, which switches app to its dev command.
