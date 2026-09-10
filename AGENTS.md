@@ -22,7 +22,7 @@ Dependencies come from `make install`, and CI uses the same target. The rest of 
 
 **`make setup` installs nothing.** The target reads `setup: pull setup`, so make drops the circular dependency, runs `pull`, stops there and still exits 0.
 
-`make test` needs the fixture image that `make pull` fetches. A single file goes through jest directly: `npx jest __tests__/index.test.js`.
+`make test` needs the fixture image that `make pull` fetches. A single file goes through jest directly: `npx jest __tests__/packageChecker.test.js`.
 
 The fixture image name `hexlet-project-source-ci_en` is pinned in three places that have to agree: `Makefile` (target `pull`), `server.js` (the API stub for `e2e`) and `__tests__/index.test.js` (the nock response).
 
@@ -31,8 +31,9 @@ The fixture image name `hexlet-project-source-ci_en` is pinned in three places t
 - `dist/` is gitignored and stays out of git: `release.yml` builds it with `@vercel/ncc` and force-adds it onto the `release` branch. `action.yml` points at `dist/run-tests/index.js` and `dist/run-post-actions/index.js`.
 - Two entry points in `bin/` are the two phases of the Action: `bin/run-tests.js` (main) and `bin/run-post-actions.js` (post — finishes the check and uploads artifacts).
 - `src/index.js` holds the orchestration: `prepareProject()` pulls the image and extracts the project source, `check()` runs Compose, `runTests()` and `runPostActions()` talk to the Hexlet API.
-- `src/routes.js` builds the API urls.
-- **The action does not check the name of the student's package.** It used to, per language, and the check was dropped: the name is load-bearing only where the project's own harness resolves the package by it. That is the php library projects, whose root `composer.json` requires `hexlet/code` from a path repository — a wrong name fails `composer install` on its own. For javascript the harness `package.json` names the dependency `"@hexlet/code": "file:code"`, and npm installs a path dependency under that key whatever the package calls itself, so the import resolves either way. For python nothing reads the distribution name: the console scripts have names of their own.
+- `src/routes.js` builds the API urls. `src/packageChecker.js` validates the package name of the student's project against the conventions of its language, reading `pyproject.toml`, `composer.json` or `package.json`.
+
+  **Do not drop this check as redundant.** It was dropped once, in #42, on the argument that the harness of every project already resolves the student package by name — and reverted. The argument holds for php (`composer.json` requires `hexlet/code` from a path repository) and for python libraries (`[tool.uv.sources]` declares `hexlet-code = { path = "code" }`, and uv refuses a mismatch with `Package metadata name … does not match given name`). It does not hold for javascript: the harness names the dependency `"@hexlet/code": "file:code"`, and npm installs a path dependency under that key whatever the package calls itself — verified on both `install` and `ci`, a package named `wrong-name` installs and imports as `@hexlet/code`. There this check is the only enforcement. Where a resolver does fail, it fails inside `make setup`, so its message lands in the middle of the log while the annotation on the run still reads "The tests have failed".
 - `check()` calls two fixed compose service names of the project — `app` for `make setup`, then `test` — and the exit code of `test` is the verdict. Both the fixed names and the flags carry `NOTE` comments in the code; read them before changing the commands.
 - Tests stub the Hexlet API with a local Fastify server (`server.js`), fixtures live in `__fixtures__/`.
 - Artifacts of the student's tests are collected from `<project>/tmp/artifacts/*/**` and uploaded as the `test-results` artifact. The glob starts one level down, so a file lying directly in `tmp/artifacts/` never reaches the student.
