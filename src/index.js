@@ -135,9 +135,8 @@ const prepareProject = async (options) => {
   });
 };
 
-const check = async ({ projectSourcePath, codePath, projectMember }) => {
-  const sourceLang = projectMember.project.language;
-  checkPackageName(codePath, sourceLang);
+const check = async ({ projectSourcePath, codePath }) => {
+  checkPackageName(codePath, projectSourcePath);
   const options = { cwd: projectSourcePath };
   // NOTE: -f docker-compose.yml is required: the project image also carries
   // docker-compose.override.yml, which switches app to its dev command.
