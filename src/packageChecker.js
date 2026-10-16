@@ -2,56 +2,46 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import ini from 'ini';
 
-// import yaml from 'js-yaml';
-// import _ from 'lodash';
-
-const parsers = {
-  json: JSON.parse,
-  toml: ini.parse,
-  // yml: yaml.load,
-};
-
-const getFullPath = (dirpath, filename) => path.resolve(dirpath, filename);
-const getFormat = (filepath) => path.extname(filepath).slice(1);
-const parse = (content, format) => parsers[format](content);
-const getData = (filepath) =>
-  parse(fs.readFileSync(filepath, 'utf-8'), getFormat(filepath));
-
-const mapping = {
-  python: {
-    expectedPackageName: 'hexlet-code',
-    getPackageName: (codePath) => {
-      const data = getData(getFullPath(codePath, 'pyproject.toml'));
-
-      return data.tool?.poetry?.name || data.project.name;
-    },
-  },
-  php: {
-    expectedPackageName: 'hexlet/code',
-    getPackageName: (codePath) =>
-      getData(getFullPath(codePath, 'composer.json')).name,
-  },
-  javascript: {
-    expectedPackageName: '@hexlet/code',
-    getPackageName: (codePath) =>
-      getData(getFullPath(codePath, 'package.json')).name,
-  },
-};
-
-const checkPackageName = (codePath, sourceLang) => {
-  const props = mapping[sourceLang];
-
-  // NOTE: If the properties for checking the current project
-  // is not found, skip the check.
-  if (!props) {
+const checkPackageName = (codePath, projectSourcePath) => {
+  const manifestPath = path.join(projectSourcePath, 'package.json');
+  if (!fs.existsSync(manifestPath)) {
     return;
   }
 
-  const { expectedPackageName, getPackageName } = props;
-  const packageName = getPackageName(codePath);
+  const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf-8'));
+  const dependencySections = [
+    manifest.dependencies,
+    manifest.devDependencies,
+    manifest.optionalDependencies,
+  ];
+  const studentPath = path.resolve(projectSourcePath, 'code');
+  const expectedNames = new Set(
+    dependencySections.flatMap((dependencies) =>
+      Object.entries(dependencies ?? {})
+        .filter(
+          ([, specifier]) =>
+            typeof specifier === 'string' &&
+            specifier.startsWith('file:') &&
+            path.resolve(projectSourcePath, specifier.slice(5)) === studentPath,
+        )
+        .map(([name]) => name),
+    ),
+  );
 
+  if (expectedNames.size === 0) {
+    return;
+  }
+  if (expectedNames.size > 1) {
+    throw new Error(
+      `Conflicting names for student package: ${[...expectedNames].join(', ')}`,
+    );
+  }
+
+  const [expectedPackageName] = expectedNames;
+  const { name: packageName } = JSON.parse(
+    fs.readFileSync(path.join(codePath, 'package.json'), 'utf-8'),
+  );
   if (packageName !== expectedPackageName) {
     throw new Error(
       `Package name should be ${expectedPackageName} instead of ${packageName}`,
