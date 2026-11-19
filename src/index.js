@@ -199,9 +199,13 @@ export const runTests = async (params) => {
 
   const link = routes.projectMemberPath(projectMemberId);
   const http = new HttpClient();
-  const response = await http.get(link);
+  const response = await http.get(link, { accept: 'application/json' });
   const data = await response.readBody();
   core.debug(data);
+  const { statusCode } = response.message;
+  if (statusCode !== 200) {
+    throw new Error(`Hexlet API answered ${statusCode} to ${link}`);
+  }
   const projectMember = JSON.parse(data);
 
   if (!projectMember.tests_on) {

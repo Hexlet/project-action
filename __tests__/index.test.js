@@ -44,3 +44,17 @@ it('runTests', async () => {
 
   expect(true).toBe(true);
 }, 50000);
+
+it('runTests fails with the API status when the project member is not found', async () => {
+  const routes = buildRoutes();
+  const projectMemberId = 2;
+  const url = new URL(routes.projectMemberPath(projectMemberId));
+  nock(url.origin).get(url.pathname).reply(404, '');
+
+  const tmp = os.tmpdir();
+  const mountPath = await fsp.mkdtemp(path.join(tmp, 'hexlet-project-mount-'));
+
+  await expect(
+    runTests({ mountPath, projectPath: mountPath, projectMemberId }),
+  ).rejects.toThrow('Hexlet API answered 404');
+});

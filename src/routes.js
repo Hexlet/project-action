@@ -11,11 +11,11 @@ const buildUrl = (part, host) => {
 
 const buildRoutes = (host = 'https://hexlet.io') => ({
   projectMemberPath: (id) => {
-    const url = buildUrl(`project_members/${id}.json`, host);
+    const url = buildUrl(`project_members/${id}`, host);
     return url;
   },
   projectMemberCheckPath: (memberId) => {
-    const url = buildUrl(`project_members/${memberId}/checks.json`, host);
+    const url = buildUrl(`project_members/${memberId}/checks`, host);
     return url;
   },
 });
