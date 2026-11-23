@@ -1,2 +1,5 @@
 node_modules
 dist/
+
+# Личные настройки агента не коммитятся.
+.claude/settings.local.json
