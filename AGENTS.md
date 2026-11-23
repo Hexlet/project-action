@@ -6,14 +6,14 @@ A GitHub Action that runs the automated check of a Hexlet educational project in
 
 The same check has a second runner for GitLab — `hexlethq/hexlet-project-source-ci`, which also publishes the project images this action pulls.
 
-## A push to `master` ships to every student
+## A push to `main` ships to every student
 
 Student workflows are pinned to `hexlet/project-action@release`, and the Hexlet monolith validates that exact string with the schema `^hexlet/project-action@release$`, so no project can stay on another ref.
 
-The `release` branch is built automatically: `test.yml` runs on every push to `master`, and a green run triggers `release.yml`, which runs `make build` and force-pushes `dist/` onto `release`. **Anything landing on `master` reaches every student of every project within minutes**, and the rollback is just as global: revert on `master` and wait for the next `release` build.
+The `release` branch is built automatically: `test.yml` runs on every push to `main`, and a green run triggers `release.yml`, which runs `make build` and force-pushes `dist/` onto `release`. **Anything landing on `main` reaches every student of every project within minutes**, and the rollback is just as global: revert on `main` and wait for the next `release` build.
 
 - Changes land through a pull request, and the merge is a human's call.
-- `release.yml` installs with `npm install`, so even a docs-only commit on `master` rebuilds the bundle against freshly resolved dependencies. A push to `master` that ships nothing does not exist.
+- `release.yml` installs with `npm install`, so even a docs-only commit on `main` rebuilds the bundle against freshly resolved dependencies. A push to `main` that ships nothing does not exist.
 - Without a green `test.yml` the `release` build never starts, so the merge ships nothing while looking successful. After a merge, check that `release` received a fresh `build: update dist` commit.
 
 ## Commands
